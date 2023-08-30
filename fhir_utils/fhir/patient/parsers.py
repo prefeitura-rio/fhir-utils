@@ -2,22 +2,26 @@
 
 def fhir_to_dict(fhir_json: str, source: str) -> dict:
     # Extract identifiers
-    identifiers = []
+    identifiers = {}
     for identifier in fhir_json["identifier"]:
-        identifiers.append({"code": identifier["type"]["coding"][0]["code"],
-                            "value": identifier["value"]})
+        identifiers[identifier["type"]["coding"][0]["code"].lower()] =  identifier["value"]
 
     # Extract extensions
-    parents = []
+    mother = ""
+    father = ""
     race_ethnicity = {"race":"", "indigenous_ethnicity":""}
 
     # TODO: add case for other extensions
     for extension in fhir_json["extension"]:
-        match  extension["extension"][0]["url"]:
+        match extension["extension"][0]["url"]:
             case "relationship":
-                parents.append({"code": extension["extension"][0]["valueCode"],
-                                "name": extension["extension"][1]["valueHumanName"]["text"]
-                                })
+                match extension["extension"][0]["valueCode"]:
+                    case "mother":
+                        mother = extension["extension"][1]["valueHumanName"]["text"]
+                    case "father":
+                        father = extension["extension"][1]["valueHumanName"]["text"]
+                    case _:
+                        pass
             case "race":
                 race_ethnicity.update({"race": extension["extension"][0]["valueCodeableConcept"]["coding"][0]["code"]})
             case _:
@@ -34,7 +38,8 @@ def fhir_to_dict(fhir_json: str, source: str) -> dict:
                      "name": fhir_json["name"][0]["text"] if "name" in fhir_json.keys() else "",
                      "nationality": "",
                      "naturalization": "",
-                     "parents": parents,
+                     "mother": mother,
+                     "father": father,
                      "protected_person": "",
                      "race_ethnicity": race_ethnicity,
                      "register_quality": "",
