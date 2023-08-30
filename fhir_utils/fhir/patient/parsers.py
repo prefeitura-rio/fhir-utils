@@ -27,24 +27,24 @@ def fhir_to_dict(fhir_json: str, source: str) -> dict:
             case _:
                 pass
 
-    return {"data": {"active": fhir_json["active"] if "active" in fhir_json.keys() else "",
-                     "address": fhir_json["address"] if "address" in fhir_json.keys() else "",
-                     "birth_city": "",
-                     "birth_country": "",
-                     "birth_date": fhir_json["birthDate"] if "birthDate" in fhir_json.keys() else "",
-                     "deceased": fhir_json["deceasedBoolean"] if "deceasedBoolean" in fhir_json.keys() else "",
-                     "gender": fhir_json["gender"] if "gender" in fhir_json.keys() else "",
-                     "identifiers": identifiers,
-                     "name": fhir_json["name"][0]["text"] if "name" in fhir_json.keys() else "",
-                     "nationality": "",
-                     "naturalization": "",
-                     "mother": mother,
-                     "father": father,
-                     "protected_person": "",
-                     "race_ethnicity": race_ethnicity,
-                     "register_quality": "",
-                     "self.telecom":  fhir_json["telecom"] if "telecom" in fhir_json.keys() else ""
-                    },
-            "source": source
+    return {"active": fhir_json["active"] if "active" in fhir_json.keys() else "",
+            "address": fhir_json["address"] if "address" in fhir_json.keys() else "",
+            "birth_city": "",
+            "birth_country": "",
+            "birth_date": fhir_json["birthDate"] if "birthDate" in fhir_json.keys() else "",
+            "deceased": fhir_json["deceasedBoolean"] if "deceasedBoolean" in fhir_json.keys() else "",
+            "gender": fhir_json["gender"] if "gender" in fhir_json.keys() else "",
+            "identifiers": identifiers,
+            "name": fhir_json["name"][0]["text"] if "name" in fhir_json.keys() else "",
+            "nationality": "",
+            "naturalization": "",
+            "mother": mother,
+            "father": father,
+            "protected_person": "",
+            "race_ethnicity": race_ethnicity,
+            "register_quality": "",
+            "self.telecom":  fhir_json["telecom"] if "telecom" in fhir_json.keys() else "",
+            "_source": source,
+            "_last_updated": ""
             }
             
