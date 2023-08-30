@@ -2,7 +2,7 @@ from fhir_utils.utils import json_to_dict
 from fhir_utils.fhir.patient.parsers import fhir_to_dict
 from fhir_utils.fhir.patient.resource import Patient
 from fhir_utils.fhir.merge import compare_resources, merge_resource
-from dataclasses import replace
+from dataclasses import replace, is_dataclass
 
 patient_json = json_to_dict("/home/thiagotrabach/tmp/patient_sample.json")
 patient_json2 = json_to_dict("/home/thiagotrabach/tmp/patient_sample2.json")
@@ -27,5 +27,5 @@ gabriela2 = Patient(name = patient2["name"],
 print(compare_resources(gabriela, gabriela2))
 print()
 print(replace(gabriela2, name = "Thiago", birth_date = "1988-01-18"))
-
+print(is_dataclass(gabriela))
 
