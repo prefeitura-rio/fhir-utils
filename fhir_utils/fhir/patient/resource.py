@@ -45,8 +45,8 @@ class Patient:
         self.name = self.format_name(self.name)
         self.mother = self.format_name(self.mother)
         self.father = self.format_name(self.father)
-        #self.format_cep()
-        #self.format_phone()
+        self.format_cep()
+        self.format_phone()
 
         # check if input is correct
         self.check_cpf()
@@ -54,8 +54,8 @@ class Patient:
         self.check_birth_country()
         self.check_birth_date()
         self.check_gender()
-        #self.check_address()
-        #self.check_telecom()
+        self.check_address()
+        self.check_telecom()
 
         # calculate register quality
 
@@ -73,7 +73,7 @@ class Patient:
         return name
     
     def format_cep(self):
-        if type(self.address) != None:
+        if type(self.address) is list:
             for i in self.address:
                 try:
                     self.address[i]["postalCode"] = keep_numeric_characters(self.address[i]["postalCode"])
@@ -81,7 +81,7 @@ class Patient:
                     pass
 
     def format_phone(self):
-        if len(self.telecom) > 0:
+        if type(self.telecom) is list:
             for i in self.address:
                 if self.telecom[i]["system"] == "phone":
                     self.telecom[i]["value"] = keep_numeric_characters(self.telecom[i]["value"])
@@ -124,65 +124,66 @@ class Patient:
             self._invalid_elements.append("gender")
 
     def check_address(self):
+        if type(self.address) is list:
+            keys = ["use", "type", "line", "city", "state", "postalCode"]
 
-        keys = ["use", "type", "line", "city", "state", "postalCode"]
+            for i in self.address:
+                # if all must have keys are present
+                if not all(key in self.address[i] for key in keys):
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
-        for i in self.address:
-            # if all must have keys are present
-            if not all(key in self.address[i] for key in keys):
-                self._is_valid = False
-                self._invalid_elements.append("address")
+                # accepted values
+                if self.address[i]["use"] not in ["home", "work", "temp", "old", "billing"]:
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
-            # accepted values
-            if self.address[i]["use"] not in ["home", "work", "temp", "old", "billing"]:
-                self._is_valid = False
-                self._invalid_elements.append("address")
+                if self.address[i]["type"] not in ["postal", "physical", "both"]:
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
-            if self.address[i]["type"] not in ["postal", "physical", "both"]:
-                self._is_valid = False
-                self._invalid_elements.append("address")
+                line = self.address[i]["line"]
+                if not 4 <= len(line) <= 5 or line[0] not in ["008", "081"]:
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
-            line = self.address[i]["line"]
-            if not 4 <= len(line) <= 5 or line[0] not in ["008", "081"]:
-                self._is_valid = False
-                self._invalid_elements.append("address")
+                if len(keep_numeric_characters(self.address[i]["city"])) != 6:
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
-            if len(keep_numeric_characters(self.address[i]["city"])) != 6:
-                self._is_valid = False
-                self._invalid_elements.append("address")
+                if len(keep_numeric_characters(self.address[i]["state"])) != 2:
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
-            if len(keep_numeric_characters(self.address[i]["state"])) != 2:
-                self._is_valid = False
-                self._invalid_elements.append("address")
-
-            if len(keep_numeric_characters(self.address[i]["postalCode"])) != 8:
-                self._is_valid = False
-                self._invalid_elements.append("address")
+                if len(keep_numeric_characters(self.address[i]["postalCode"])) != 8:
+                    self._is_valid = False
+                    self._invalid_elements.append("address")
 
     def check_telecom(self):
         
-        keys = ["system", "value", "use"]
+        if type(self.telecom) is list:
+            keys = ["system", "value", "use"]
 
-        for i in self.telecom:
-            # if all must have keys are present
-            if not all(key in self.telecom[i] for key in keys):
-                self._is_valid = False
-                self._invalid_elements.append("telecom")
+            for i in self.telecom:
+                # if all must have keys are present
+                if not all(key in self.telecom[i] for key in keys):
+                    self._is_valid = False
+                    self._invalid_elements.append("telecom")
 
-            # accepted values
-            if self.telecom[i]["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
-                self._is_valid = False
-                self._invalid_elements.append("telecom")
+                # accepted values
+                if self.telecom[i]["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
+                    self._is_valid = False
+                    self._invalid_elements.append("telecom")
 
-            tel_number = keep_alpha_characters(self.telecom[i]["value"])
-            if self.telecom[i]["system"] == "phone" and not 12 <= len(tel_number) <=13: # ddi+ddd+phone
-                self._is_valid = False
-                self._invalid_elements.append("telecom")
+                tel_number = keep_alpha_characters(self.telecom[i]["value"])
+                if self.telecom[i]["system"] == "phone" and not 12 <= len(tel_number) <=13: # ddi+ddd+phone
+                    self._is_valid = False
+                    self._invalid_elements.append("telecom")
 
-            email = self.telecom[i]["value"]
-            if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
-                self._is_valid = False
-                self._invalid_elements.append("telecom")
+                email = self.telecom[i]["value"]
+                if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
+                    self._is_valid = False
+                    self._invalid_elements.append("telecom")
 
     def compare(self, new_resource):
         # compare current patient with another one
