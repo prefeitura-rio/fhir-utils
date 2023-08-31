@@ -6,8 +6,8 @@ from fhir_utils.utils import (
     remove_wrong_whitespaces, 
     is_valid_cpf, 
     is_valid_date_format)
-from fhir_utils.fhir.merge import compare_resources, merge_resource
-from dataclasses import dataclass, field, is_dataclass
+from fhir_utils.fhir.merge import compare_resources, merge_element
+from dataclasses import dataclass, field, is_dataclass, replace
 from datetime import datetime
 import re
 import logging
@@ -32,8 +32,8 @@ class Patient:
     protected_person : bool = ""
     race: str = ""
     ethnicity : str = ""
-    register_quality : float = ""
     telecom : list = field(default_factory=list)
+    register_quality : float = ""
     _is_valid: bool = True
     _invalid_elements: list = field(default_factory=list)
     _resource_type = "patient"
@@ -45,8 +45,8 @@ class Patient:
         self.name = self.format_name(self.name)
         self.mother = self.format_name(self.mother)
         self.father = self.format_name(self.father)
-        self.format_cep()
-        self.format_phone()
+        #self.format_cep()
+        #self.format_phone()
 
         # check if input is correct
         self.check_cpf()
@@ -54,8 +54,10 @@ class Patient:
         self.check_birth_country()
         self.check_birth_date()
         self.check_gender()
-        self.check_address()
-        self.check_telecom()
+        #self.check_address()
+        #self.check_telecom()
+
+        # calculate register quality
 
 
     def format_cpf(self):
@@ -71,13 +73,18 @@ class Patient:
         return name
     
     def format_cep(self):
-        for i in self.address:
-            self.address[i]["postalCode"] = keep_numeric_characters(self.address[i]["postalCode"])
+        if type(self.address) != None:
+            for i in self.address:
+                try:
+                    self.address[i]["postalCode"] = keep_numeric_characters(self.address[i]["postalCode"])
+                except:
+                    pass
 
     def format_phone(self):
-        for i in self.address:
-            if self.telecom[i]["system"] == "phone":
-                self.telecom[i]["value"] = keep_numeric_characters(self.telecom[i]["value"])
+        if len(self.telecom) > 0:
+            for i in self.address:
+                if self.telecom[i]["system"] == "phone":
+                    self.telecom[i]["value"] = keep_numeric_characters(self.telecom[i]["value"])
 
 
     def check_cpf(self):
@@ -205,4 +212,25 @@ class Patient:
             
         if force_invalid_merge == True:
             logging.warning("Force merge invalid resources enabled")
-    
+
+        # start merge process
+
+        return replace(self,
+                        name = merge_element(self.name, new_resource.name, mode = "coalesce"),
+                        gender = merge_element(self.gender, new_resource.gender, mode = "coalesce"),
+                        birth_date = merge_element(self.birth_date, new_resource.birth_date, mode = "coalesce"),
+                        birth_country = merge_element(self.birth_country, new_resource.birth_country, mode = "coalesce"),
+                        cns = merge_element(self.cns, new_resource.cns, mode = "coalesce"),
+                        active = merge_element(self.active, new_resource.active, mode = "replace"),
+                        address = merge_element(self.address, new_resource.address, mode = "append"),
+                        birth_city = merge_element(self.birth_city, new_resource.birth_city, mode = "coalesce"),
+                        deceased = merge_element(self.deceased, new_resource.deceased, mode = "coalesce"),
+                        nationality = merge_element(self.nationality, new_resource.nationality, mode = "coalesce"),
+                        naturalization = merge_element(self.naturalization, new_resource.naturalization, mode = "coalesce"),
+                        mother = merge_element(self.mother, new_resource.mother, mode = "coalesce"),
+                        father = merge_element(self.father, new_resource.father, mode = "coalesce"),
+                        protected_person = merge_element(self.protected_person, new_resource.protected_person, mode = "coalesce"),
+                        race = merge_element(self.race, new_resource.race, mode = "coalesce"),
+                        ethnicity = merge_element(self.ethnicity, new_resource.ethnicity, mode = "coalesce"),
+                        telecom = merge_element(self.telecom, new_resource.telecom, mode = "append"),
+                        )
