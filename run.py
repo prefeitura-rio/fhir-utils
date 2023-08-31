@@ -15,17 +15,22 @@ patient2 = fhir_to_dict(patient_json2, "vitacare")
 gabriela = Patient(name = patient["name"],
                    cpf = patient["identifiers"]["tax"],
                    birth_date = patient["birth_date"],
-                   source ="vitai" )
+                   source ="vitai",
+                   mother = patient["mother"],
+                   father = patient["father"],
+                   gender = "macho")
 
 gabriela2 = Patient(name = patient2["name"],
                    cpf = patient2["identifiers"]["tax"],
                    birth_date = patient2["birth_date"],
                    father = "Deus",
-                   source ="vitai" )
+                   source ="vitai" ,
+                   gender = patient2["gender"])
 
 
 print(compare_resources(gabriela, gabriela2))
 print()
-print(replace(gabriela2, name = "Thiago", birth_date = "1988-01-18"))
-print(is_dataclass(gabriela))
+print(gabriela)
+#print(replace(gabriela2, name = "Thiago", birth_date = "1988-01-18"))
+#print(is_dataclass(gabriela))
 
