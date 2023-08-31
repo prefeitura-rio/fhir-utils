@@ -6,9 +6,11 @@ from fhir_utils.utils import (
     remove_wrong_whitespaces, 
     is_valid_cpf, 
     is_valid_date_format)
-from dataclasses import dataclass, field
+from fhir_utils.fhir.merge import compare_resources, merge_resource
+from dataclasses import dataclass, field, is_dataclass
 from datetime import datetime
 import re
+import logging
 
 @dataclass
 class Patient:
@@ -34,6 +36,7 @@ class Patient:
     telecom : list = field(default_factory=list)
     _is_valid: bool = True
     _invalid_elements: list = field(default_factory=list)
+    _resource_type = "patient"
 
     def __post_init__(self):
         # format values
@@ -173,3 +176,33 @@ class Patient:
             if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
                 self._is_valid = False
                 self._invalid_elements.append("telecom")
+
+    def compare(self, new_resource):
+        # compare current patient with another one
+        if is_dataclass(new_resource):
+            if new_resource._resource_type != "patient":
+                raise TypeError("The new resource must be the same class")
+        else:
+            raise TypeError("The new resource must be the same class")
+
+        return compare_resources(self, new_resource)
+
+    def merge(self, new_resource, force_invalid_merge: False):    
+        
+        # check if both resource are of the same type
+        if is_dataclass(new_resource):
+            try:
+                if new_resource._resource_type != "patient":
+                    raise TypeError("The new resource must be the same class")
+            except:
+                pass
+        else:
+            raise TypeError("The new resource must be the same class")
+        
+        # check if any resource is not valid
+        if force_invalid_merge == False and (self._is_valid == False or new_resource._is_valid == False):
+            raise ValueError("Can't merge invalid resource")
+            
+        if force_invalid_merge == True:
+            logging.warning("Force merge invalid resources enabled")
+    
