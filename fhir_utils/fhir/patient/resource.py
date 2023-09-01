@@ -24,7 +24,7 @@ class Patient:
     active : bool = True
     address : list = field(default_factory=list)
     birth_city : str = ""
-    deceased : bool = True
+    deceased : bool = False
     nationality : str = ""
     naturalization : str = ""
     mother : str = ""
@@ -192,8 +192,8 @@ class Patient:
 
         for p in self.__dict__.items():
             if p[0] in quality_properties:
-                if type(p[0]) is str and p[1] != "" and p[0] not in self._invalid_elements:
-                    counter += 1
+                if type(p[0]) is str and p[1] != "" and p[1] != None and p[0] not in self._invalid_elements:
+                    counter += 1 
                 elif type(p[0]) is list and len(p[1]) > 0 and p[0] not in self._invalid_elements:
                     counter += 1
 
