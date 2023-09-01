@@ -105,7 +105,7 @@ class Patient:
             #raise ValueError("CNS must have 15 digits")
         
     def check_birth_country(self):
-        if self.gender not in ["B", "E", "N"]:
+        if self.birth_country not in ["B", "E", "N"]:
             self._is_valid = False
             self._invalid_elements.append("birth_country")
     
