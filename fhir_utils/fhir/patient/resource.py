@@ -87,6 +87,7 @@ class Patient:
                     pass
 
     def format_phone(self):
+        # TODO: add DDI and DDD if no present
         if type(self.telecom) is list:
             for i in self.address:
                 if self.telecom[i]["system"] == "phone":
@@ -252,3 +253,5 @@ class Patient:
                         telecom = merge_element(self.telecom, nr.telecom, mode = "append"),
                         source = "smsrio",
                         )
+
+    # TODO: add method to export to fhir (dict)
