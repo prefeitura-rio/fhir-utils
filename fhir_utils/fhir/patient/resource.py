@@ -33,12 +33,18 @@ class Patient:
     race: str = ""
     ethnicity : str = ""
     telecom : list = field(default_factory=list)
-    register_quality : float = ""
-    _is_valid: bool = True
-    _invalid_elements: list = field(default_factory=list)
-    _resource_type = "patient"
+    register_quality : float = field(init = False)
+    _is_valid: bool = field(init = False)
+    _invalid_elements: list = field(init = False)
+    _resource_type : str = field(init = False)
 
     def __post_init__(self):
+        # default values
+        self._resource_type = "patient"
+        self._is_valid = True
+        self._invalid_elements = []
+        self.register_quality = 0
+
         # format values
         self.format_cpf()
         self.format_cns()
@@ -58,7 +64,7 @@ class Patient:
         self.check_telecom()
 
         # calculate register quality
-
+        self.calculate_register_quality()
 
     def format_cpf(self):
         self.cpf = keep_numeric_characters(self.cpf)
@@ -85,7 +91,6 @@ class Patient:
             for i in self.address:
                 if self.telecom[i]["system"] == "phone":
                     self.telecom[i]["value"] = keep_numeric_characters(self.telecom[i]["value"])
-
 
     def check_cpf(self):
         if not is_valid_cpf(self.cpf):
@@ -134,28 +139,27 @@ class Patient:
                     self._invalid_elements.append("address")
 
                 # accepted values
-                if self.address[i]["use"] not in ["home", "work", "temp", "old", "billing"]:
+                elif self.address[i]["use"] not in ["home", "work", "temp", "old", "billing"]:
                     self._is_valid = False
                     self._invalid_elements.append("address")
 
-                if self.address[i]["type"] not in ["postal", "physical", "both"]:
+                elif self.address[i]["type"] not in ["postal", "physical", "both"]:
                     self._is_valid = False
                     self._invalid_elements.append("address")
 
-                line = self.address[i]["line"]
-                if not 4 <= len(line) <= 5 or line[0] not in ["008", "081"]:
+                elif not 4 <= len(self.address[i]["line"]) <= 5 or self.address[i]["line"][0] not in ["008", "081"]:
                     self._is_valid = False
                     self._invalid_elements.append("address")
 
-                if len(keep_numeric_characters(self.address[i]["city"])) != 6:
+                elif len(keep_numeric_characters(self.address[i]["city"])) != 6:
                     self._is_valid = False
                     self._invalid_elements.append("address")
 
-                if len(keep_numeric_characters(self.address[i]["state"])) != 2:
+                elif len(keep_numeric_characters(self.address[i]["state"])) != 2:
                     self._is_valid = False
                     self._invalid_elements.append("address")
 
-                if len(keep_numeric_characters(self.address[i]["postalCode"])) != 8:
+                elif len(keep_numeric_characters(self.address[i]["postalCode"])) != 8:
                     self._is_valid = False
                     self._invalid_elements.append("address")
 
@@ -171,19 +175,34 @@ class Patient:
                     self._invalid_elements.append("telecom")
 
                 # accepted values
-                if self.telecom[i]["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
+                elif self.telecom[i]["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
                     self._is_valid = False
                     self._invalid_elements.append("telecom")
 
-                tel_number = keep_alpha_characters(self.telecom[i]["value"])
-                if self.telecom[i]["system"] == "phone" and not 12 <= len(tel_number) <=13: # ddi+ddd+phone
+                elif self.telecom[i]["system"] == "phone" and not 12 <= len(keep_alpha_characters(self.telecom[i]["value"])) <=13: # ddi+ddd+phone
                     self._is_valid = False
                     self._invalid_elements.append("telecom")
 
-                email = self.telecom[i]["value"]
-                if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email):
+                elif not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", self.telecom[i]["value"]):
                     self._is_valid = False
                     self._invalid_elements.append("telecom")
+
+    def calculate_register_quality(self):
+        counter = 0
+
+        quality_properties = ["cpf", "gender", "birth_date", "birth_country", "cns",
+                               "active", "address", "birth_city", "deceased", "nationality", 
+                               "naturalization", "mother", "father", "protected_person", 
+                               "race", "ethnicity","telecom"]
+
+        for p in self.__dict__.items():
+            if p[0] in quality_properties:
+                if type(p[0]) is str and p[1] != "" and p[0] not in self._invalid_elements:
+                    counter += 1
+                elif type(p[0]) is list and len(p[1]) > 0 and p[0] not in self._invalid_elements:
+                    counter += 1
+
+        self.register_quality = int(counter/len(quality_properties) * 100)
 
     def compare(self, new_resource):
         # compare current patient with another one
@@ -215,6 +234,7 @@ class Patient:
             logging.warning("Force merge invalid resources enabled")
 
         # start merge process
+        # TODO: check if new telecom and address are the same or not before appending
 
         return replace(self,
                         name = merge_element(self.name, new_resource.name, mode = "coalesce"),
@@ -234,4 +254,5 @@ class Patient:
                         race = merge_element(self.race, new_resource.race, mode = "coalesce"),
                         ethnicity = merge_element(self.ethnicity, new_resource.ethnicity, mode = "coalesce"),
                         telecom = merge_element(self.telecom, new_resource.telecom, mode = "append"),
+                        source = "smsrio",
                         )

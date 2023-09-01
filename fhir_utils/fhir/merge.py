@@ -45,6 +45,3 @@ def merge_element(old_element, new_element, mode = "coalesce", coalesce_priority
             else:
                 raise ValueError("Wrong value for coalesce priority")
             
-
-def merge_resource(old_resource):
-    return replace(old_resource, name = "thiago")
