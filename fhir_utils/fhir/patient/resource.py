@@ -214,9 +214,10 @@ class Patient:
         # TODO: mode that discard invalid values
 
         # check if both resource are of the same type
-        if is_dataclass(new_resource):
+        nr = new_resource
+        if is_dataclass(nr):
             try:
-                if new_resource._resource_type != "patient":
+                if nr._resource_type != "patient":
                     raise TypeError("The new resource must be the same class")
             except:
                 pass
@@ -224,7 +225,7 @@ class Patient:
             raise TypeError("The new resource must be the same class")
         
         # check if any resource is not valid
-        if force_invalid_merge == False and (self._is_valid == False or new_resource._is_valid == False):
+        if force_invalid_merge == False and (self._is_valid == False or nr._is_valid == False):
             raise ValueError("Can't merge invalid resource")
             
         if force_invalid_merge == True:
@@ -232,22 +233,22 @@ class Patient:
 
         # start merge process
         return replace(self,
-                        name = merge_element(self.name, new_resource.name, mode = "coalesce"),
-                        gender = merge_element(self.gender, new_resource.gender, mode = "coalesce"),
-                        birth_date = merge_element(self.birth_date, new_resource.birth_date, mode = "coalesce"),
-                        birth_country = merge_element(self.birth_country, new_resource.birth_country, mode = "coalesce"),
-                        cns = merge_element(self.cns, new_resource.cns, mode = "coalesce"),
-                        active = merge_element(self.active, new_resource.active, mode = "replace"),
-                        address = merge_element(self.address, new_resource.address, mode = "append"),
-                        birth_city = merge_element(self.birth_city, new_resource.birth_city, mode = "coalesce"),
-                        deceased = merge_element(self.deceased, new_resource.deceased, mode = "coalesce"),
-                        nationality = merge_element(self.nationality, new_resource.nationality, mode = "coalesce"),
-                        naturalization = merge_element(self.naturalization, new_resource.naturalization, mode = "coalesce"),
-                        mother = merge_element(self.mother, new_resource.mother, mode = "coalesce"),
-                        father = merge_element(self.father, new_resource.father, mode = "coalesce"),
-                        protected_person = merge_element(self.protected_person, new_resource.protected_person, mode = "coalesce"),
-                        race = merge_element(self.race, new_resource.race, mode = "coalesce"),
-                        ethnicity = merge_element(self.ethnicity, new_resource.ethnicity, mode = "coalesce"),
-                        telecom = merge_element(self.telecom, new_resource.telecom, mode = "append"),
+                        name = merge_element(self.name, nr.name, mode = "coalesce"),
+                        gender = merge_element(self.gender, nr.gender, mode = "coalesce"),
+                        birth_date = merge_element(self.birth_date, nr.birth_date, mode = "coalesce"),
+                        birth_country = merge_element(self.birth_country, nr.birth_country, mode = "coalesce"),
+                        cns = merge_element(self.cns, nr.cns, mode = "coalesce"),
+                        active = merge_element(self.active, nr.active, mode = "replace"),
+                        address = merge_element(self.address, nr.address, mode = "append"),
+                        birth_city = merge_element(self.birth_city, nr.birth_city, mode = "coalesce"),
+                        deceased = merge_element(self.deceased, nr.deceased, mode = "coalesce"),
+                        nationality = merge_element(self.nationality, nr.nationality, mode = "coalesce"),
+                        naturalization = merge_element(self.naturalization, nr.naturalization, mode = "coalesce"),
+                        mother = merge_element(self.mother, nr.mother, mode = "coalesce"),
+                        father = merge_element(self.father, nr.father, mode = "coalesce"),
+                        protected_person = merge_element(self.protected_person, nr.protected_person, mode = "coalesce"),
+                        race = merge_element(self.race, nr.race, mode = "coalesce"),
+                        ethnicity = merge_element(self.ethnicity, nr.ethnicity, mode = "coalesce"),
+                        telecom = merge_element(self.telecom, nr.telecom, mode = "append"),
                         source = "smsrio",
                         )
