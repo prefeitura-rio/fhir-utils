@@ -96,13 +96,11 @@ class Patient:
         if not is_valid_cpf(self.cpf):
             self._is_valid = False
             self._invalid_elements.append("cpf")
-            #raise ValueError("CPF not valid")
 
     def check_cns(self):
         if len(self.cns) > 0 and len(self.cns) != 15:
             self._is_valid = False
             self._invalid_elements.append("cns")
-            #raise ValueError("CNS must have 15 digits")
         
     def check_birth_country(self):
         if self.birth_country not in ["B", "E", "N"]:
@@ -113,15 +111,12 @@ class Patient:
         if not is_valid_date_format(self.birth_date):
             self._is_valid = False
             self._invalid_elements.append("birth_date")
-            #raise ValueError("Birth date must be formated like 'YYYY-MM-DD'")
         elif datetime.strptime(self.birth_date, "%Y-%m-%d") > datetime.now():
             self._is_valid = False
             self._invalid_elements.append("birth_date")
-            #raise ValueError("So you were born in the future?")
         elif datetime.strptime(self.birth_date, "%Y-%m-%d") < datetime(1900, 1, 1):
             self._is_valid = False
             self._invalid_elements.append("birth_date")
-            #raise ValueError("You cant be that old!")
     
     def check_gender(self):
         if self.gender not in ["male", "female", "unknown"]:
