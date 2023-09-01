@@ -215,7 +215,9 @@ class Patient:
         return compare_resources(self, new_resource)
 
     def merge(self, new_resource, force_invalid_merge: False):    
-        
+        # TODO: check if new telecom and address are the same or not before appending
+        # TODO: mode that discard invalid values
+
         # check if both resource are of the same type
         if is_dataclass(new_resource):
             try:
@@ -234,8 +236,6 @@ class Patient:
             logging.warning("Force merge invalid resources enabled")
 
         # start merge process
-        # TODO: check if new telecom and address are the same or not before appending
-
         return replace(self,
                         name = merge_element(self.name, new_resource.name, mode = "coalesce"),
                         gender = merge_element(self.gender, new_resource.gender, mode = "coalesce"),
