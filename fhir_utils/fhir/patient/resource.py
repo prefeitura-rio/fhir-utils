@@ -185,7 +185,7 @@ class Patient:
     def calculate_register_quality(self):
         counter = 0
 
-        quality_properties = ["cpf", "gender", "birth_date", "birth_country", "cns",
+        quality_properties = ["name", "cpf", "gender", "birth_date", "birth_country", "cns",
                                "active", "address", "birth_city", "deceased", "nationality", 
                                "naturalization", "mother", "father", "protected_person", 
                                "race", "ethnicity","telecom"]
