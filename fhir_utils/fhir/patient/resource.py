@@ -210,8 +210,7 @@ class Patient:
 
         return compare_resources(self, new_resource)
 
-    def merge(self, new_resource, force_invalid_merge: False):    
-        # TODO: check if new telecom and address are the same or not before appending
+    def merge(self, new_resource, force_invalid_merge: False):
         # TODO: mode that discard invalid values
 
         # check if both resource are of the same type
@@ -240,7 +239,7 @@ class Patient:
                         birth_country = merge_element(self.birth_country, nr.birth_country, mode = "coalesce"),
                         cns = merge_element(self.cns, nr.cns, mode = "coalesce"),
                         active = merge_element(self.active, nr.active, mode = "replace"),
-                        address = merge_element(self.address, nr.address, mode = "append"),
+                        address = merge_element(self.address, nr.address, mode = "append", unique_check=True, unique_key="postalCode"),
                         birth_city = merge_element(self.birth_city, nr.birth_city, mode = "coalesce"),
                         deceased = merge_element(self.deceased, nr.deceased, mode = "coalesce"),
                         nationality = merge_element(self.nationality, nr.nationality, mode = "coalesce"),
@@ -250,7 +249,7 @@ class Patient:
                         protected_person = merge_element(self.protected_person, nr.protected_person, mode = "coalesce"),
                         race = merge_element(self.race, nr.race, mode = "coalesce"),
                         ethnicity = merge_element(self.ethnicity, nr.ethnicity, mode = "coalesce"),
-                        telecom = merge_element(self.telecom, nr.telecom, mode = "append"),
+                        telecom = merge_element(self.telecom, nr.telecom, mode = "append", unique_check=True, unique_key="value"),
                         source = "smsrio",
                         )
 
