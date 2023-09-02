@@ -80,7 +80,7 @@ class Patient:
     
     def format_cep(self):
         if type(self.address) is list:
-            for i in self.address:
+            for i, _ in enumerate(self.address):
                 try:
                     self.address[i]["postalCode"] = keep_numeric_characters(self.address[i]["postalCode"])
                 except:
@@ -89,7 +89,7 @@ class Patient:
     def format_phone(self):
         # TODO: add DDI and DDD if no present
         if type(self.telecom) is list:
-            for i in self.address:
+            for i, _ in enumerate(self.telecom):
                 if self.telecom[i]["system"] == "phone":
                     self.telecom[i]["value"] = keep_numeric_characters(self.telecom[i]["value"])
 
@@ -128,7 +128,7 @@ class Patient:
         if type(self.address) is list:
             keys = ["use", "type", "line", "city", "state", "postalCode"]
 
-            for i in self.address:
+            for i, _ in enumerate(self.address):
                 # if all must have keys are present
                 if not all(key in self.address[i] for key in keys):
                     self._is_valid = False
@@ -164,7 +164,7 @@ class Patient:
         if type(self.telecom) is list:
             keys = ["system", "value", "use"]
 
-            for i in self.telecom:
+            for i, _ in enumerate(self.telecom):
                 # if all must have keys are present
                 if not all(key in self.telecom[i] for key in keys):
                     self._is_valid = False
