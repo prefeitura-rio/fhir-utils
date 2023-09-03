@@ -12,6 +12,7 @@ from datetime import datetime
 import re
 import logging
 
+
 @dataclass
 class Patient:
     source : str
@@ -87,101 +88,132 @@ class Patient:
                     pass
 
     def format_phone(self):
-        # TODO: add DDI and DDD if no present
+        # We assume that any phone without state code state are from Rio de Janeiro city
         if type(self.telecom) is list:
             for i, _ in enumerate(self.telecom):
                 if self.telecom[i]["system"] == "phone":
-                    self.telecom[i]["value"] = keep_numeric_characters(self.telecom[i]["value"])
+                    phone = keep_numeric_characters(self.telecom[i]["value"])
+                    if phone[0] == "0": # zero on the left for state code
+                        phone = phone[1:]
+                    print(phone)
+                    if 8 <= len(phone) <= 9: 
+                        phone = f"5521{phone}" 
+                    elif 10 <= len(phone) <= 11:
+                        phone = f"55{phone}"
+                        
+                    self.telecom[i]["value"] = phone
 
     def check_cpf(self):
         if not is_valid_cpf(self.cpf):
             self._is_valid = False
             self._invalid_elements.append("cpf")
+            return False
+        else:
+            return True
 
     def check_cns(self):
         if len(self.cns) > 0 and len(self.cns) != 15:
             self._is_valid = False
             self._invalid_elements.append("cns")
+            return False
+        else:
+            return True
         
     def check_birth_country(self):
         if self.birth_country not in ["B", "E", "N"]:
             self._is_valid = False
             self._invalid_elements.append("birth_country")
+            return False
+        else:
+            return True
+
     
     def check_birth_date(self):
+        is_valid = True
         if not is_valid_date_format(self.birth_date):
-            self._is_valid = False
-            self._invalid_elements.append("birth_date")
+            is_valid = False
         elif datetime.strptime(self.birth_date, "%Y-%m-%d") > datetime.now():
-            self._is_valid = False
-            self._invalid_elements.append("birth_date")
+            is_valid = False
         elif datetime.strptime(self.birth_date, "%Y-%m-%d") < datetime(1900, 1, 1):
+            is_valid = False
+        
+        if is_valid:
+            return True
+        else:
             self._is_valid = False
             self._invalid_elements.append("birth_date")
+            return False
     
     def check_gender(self):
         if self.gender not in ["male", "female", "unknown"]:
             self._is_valid = False
             self._invalid_elements.append("gender")
+            return False
+        else:
+            return True
 
     def check_address(self):
+        is_valid = True
+        
         if type(self.address) is list:
+
             keys = ["use", "type", "line", "city", "state", "postalCode"]
 
             for i, _ in enumerate(self.address):
                 # if all must have keys are present
                 if not all(key in self.address[i] for key in keys):
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
-
+                    is_valid = False
                 # accepted values
                 elif self.address[i]["use"] not in ["home", "work", "temp", "old", "billing"]:
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
-
+                    is_valid = False
                 elif self.address[i]["type"] not in ["postal", "physical", "both"]:
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
-
+                    is_valid = False
                 elif not 4 <= len(self.address[i]["line"]) <= 5 or self.address[i]["line"][0] not in ["008", "081"]:
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
-
+                    is_valid = False
                 elif len(keep_numeric_characters(self.address[i]["city"])) != 6:
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
-
+                    is_valid = False
                 elif len(keep_numeric_characters(self.address[i]["state"])) != 2:
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
-
+                    is_valid = False
                 elif len(keep_numeric_characters(self.address[i]["postalCode"])) != 8:
-                    self._is_valid = False
-                    self._invalid_elements.append("address")
+                    is_valid = False
 
+        if is_valid:
+            return True
+        else:
+            self._is_valid = False
+            self._invalid_elements.append("address")
+            return False
+             
     def check_telecom(self):
-        
+        # TODO: raise type error execption if not a list
+        is_valid = True
+
         if type(self.telecom) is list:
+
             keys = ["system", "value", "use"]
 
             for i, _ in enumerate(self.telecom):
                 # if all must have keys are present
                 if not all(key in self.telecom[i] for key in keys):
-                    self._is_valid = False
-                    self._invalid_elements.append("telecom")
-
+                    is_valid = False
                 # accepted values
                 elif self.telecom[i]["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
-                    self._is_valid = False
-                    self._invalid_elements.append("telecom")
-
+                    is_valid = False
                 elif self.telecom[i]["system"] == "phone" and not 12 <= len(keep_alpha_characters(self.telecom[i]["value"])) <=13: # ddi+ddd+phone
-                    self._is_valid = False
-                    self._invalid_elements.append("telecom")
-
+                    is_valid = False
                 elif not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", self.telecom[i]["value"]):
-                    self._is_valid = False
-                    self._invalid_elements.append("telecom")
+                    is_valid = False
+        
+            if is_valid:
+                return True
+            else:
+                self._is_valid = False
+                self._invalid_elements.append("telecom")
+                return False
+            
+        else:
+            raise TypeError("Telecom must be a list of dicts")
+
 
     def calculate_register_quality(self):
         counter = 0
