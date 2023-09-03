@@ -61,4 +61,96 @@ def test_check_cpf():
 
     patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B")
     patient.check_cpf()
-    assert patient.check_cpf() == False
+    assert patient.check_cpf() == False and "cpf" in patient._invalid_elements
+
+def test_check_cns():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", cns="213321999239456", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient.check_cns() == True
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", cns="213321999", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient.check_cns() == False and "cns" in patient._invalid_elements
+
+def test_check_birth_country():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient.check_birth_country() == True
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="Brasil")
+    assert patient.check_birth_country() == False and "birth_country" in patient._invalid_elements
+
+def test_check_birth_date():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient.check_birth_date() == True
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="01-01-1990", birth_country="B")
+    assert patient.check_birth_date() == False and "birth_date" in patient._invalid_elements
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="2100-01-01", birth_country="B")
+    assert patient.check_birth_date() == False and "birth_date" in patient._invalid_elements
+
+def test_check_gender():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient.check_gender() == True
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="m", birth_date="01-01-1990", birth_country="B")
+    assert patient.check_gender() == False and "gender" in patient._invalid_elements
+
+def test_check_address():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                      address=[{"use": "home",
+                                "type": "both",
+                                "line": ["081",
+                                          "SQN  BLOCO M",
+                                          "604",
+                                          "APARTAMENTO",
+                                          "ASA NORTE"],
+                                "city": "315780",
+                                "state": "53",
+                                "postalCode": "70752130"}])
+    
+    assert patient.check_address() == True
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                      address=[{"use": "home",
+                                "type": "both",
+                                "line": ["RUA",
+                                        "SQN  BLOCO M",
+                                        "604"],
+                                "city": "Rio de Janeiro",
+                                "state": "RJ",
+                                "postalCode": "7075230"}])
+    assert patient.check_address() == False and "address" in patient._invalid_elements
+
+
+def test_check_address():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                      address=[{"use": "home",
+                                "type": "both",
+                                "line": ["081",
+                                          "SQN  BLOCO M",
+                                          "604",
+                                          "APARTAMENTO",
+                                          "ASA NORTE"],
+                                "city": "315780",
+                                "state": "53",
+                                "postalCode": "70752130"}])
+    
+    assert patient.check_address() == True
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                      address=[{"use": "home",
+                                "type": "both",
+                                "line": ["RUA",
+                                        "SQN  BLOCO M",
+                                        "604"],
+                                "city": "Rio de Janeiro",
+                                "state": "RJ",
+                                "postalCode": "7075230"}])
+    assert patient.check_address() == False and "address" in patient._invalid_elements
+
+def test_check_telecom():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                     telecom=[{"system": "phone",
+                               "value": "552134567890",
+                               "use": "home"}] )
+    assert patient.check_telecom() == True
+

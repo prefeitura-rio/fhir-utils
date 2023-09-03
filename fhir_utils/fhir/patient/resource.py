@@ -81,21 +81,20 @@ class Patient:
     
     def format_cep(self):
         if type(self.address) is list:
-            for i, _ in enumerate(self.address):
+            for i, address in enumerate(self.address):
                 try:
-                    self.address[i]["postalCode"] = keep_numeric_characters(self.address[i]["postalCode"])
+                    self.address[i]["postalCode"] = keep_numeric_characters(address["postalCode"])
                 except:
                     pass
 
     def format_phone(self):
         # We assume that any phone without state code state are from Rio de Janeiro city
         if type(self.telecom) is list:
-            for i, _ in enumerate(self.telecom):
-                if self.telecom[i]["system"] == "phone":
-                    phone = keep_numeric_characters(self.telecom[i]["value"])
+            for i, telecom in enumerate(self.telecom):
+                if telecom["system"] == "phone":
+                    phone = keep_numeric_characters(telecom["value"])
                     if phone[0] == "0": # zero on the left for state code
                         phone = phone[1:]
-                    print(phone)
                     if 8 <= len(phone) <= 9: 
                         phone = f"5521{phone}" 
                     elif 10 <= len(phone) <= 11:
@@ -159,22 +158,22 @@ class Patient:
 
             keys = ["use", "type", "line", "city", "state", "postalCode"]
 
-            for i, _ in enumerate(self.address):
+            for i, address in enumerate(self.address):
                 # if all must have keys are present
-                if not all(key in self.address[i] for key in keys):
+                if not all(key in address for key in keys):
                     is_valid = False
                 # accepted values
-                elif self.address[i]["use"] not in ["home", "work", "temp", "old", "billing"]:
+                elif address["use"] not in ["home", "work", "temp", "old", "billing"]:
                     is_valid = False
-                elif self.address[i]["type"] not in ["postal", "physical", "both"]:
+                elif address["type"] not in ["postal", "physical", "both"]:
                     is_valid = False
-                elif not 4 <= len(self.address[i]["line"]) <= 5 or self.address[i]["line"][0] not in ["008", "081"]:
+                elif not 4 <= len(address["line"]) <= 5 or address["line"][0] not in ["008", "081"]:
                     is_valid = False
-                elif len(keep_numeric_characters(self.address[i]["city"])) != 6:
+                elif len(keep_numeric_characters(address["city"])) != 6:
                     is_valid = False
-                elif len(keep_numeric_characters(self.address[i]["state"])) != 2:
+                elif len(keep_numeric_characters(address["state"])) != 2:
                     is_valid = False
-                elif len(keep_numeric_characters(self.address[i]["postalCode"])) != 8:
+                elif len(keep_numeric_characters(address["postalCode"])) != 8:
                     is_valid = False
 
         if is_valid:
@@ -187,21 +186,24 @@ class Patient:
     def check_telecom(self):
         # TODO: raise type error execption if not a list
         is_valid = True
-
+        print(is_valid)
         if type(self.telecom) is list:
 
             keys = ["system", "value", "use"]
-
-            for i, _ in enumerate(self.telecom):
+            
+            for i, telecom in enumerate(self.telecom):
+                print(telecom, i)
                 # if all must have keys are present
-                if not all(key in self.telecom[i] for key in keys):
+                if not all(key in telecom for key in keys):
                     is_valid = False
                 # accepted values
-                elif self.telecom[i]["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
+                elif telecom["system"] not in ["phone", "fax", "email", "pager", "url", "sms", "other"]:
                     is_valid = False
-                elif self.telecom[i]["system"] == "phone" and not 12 <= len(keep_alpha_characters(self.telecom[i]["value"])) <=13: # ddi+ddd+phone
+                elif telecom["use"] not in ["home", "work", "temp", "old", "mobile"]:
                     is_valid = False
-                elif not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", self.telecom[i]["value"]):
+                elif telecom["system"] == "phone" and not 12 <= len(keep_alpha_characters(telecom["value"])) <=13: # ddi+ddd+phone
+                    is_valid = False
+                elif telecom["system"] == "email" and not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", telecom["value"]):
                     is_valid = False
         
             if is_valid:
@@ -210,9 +212,7 @@ class Patient:
                 self._is_valid = False
                 self._invalid_elements.append("telecom")
                 return False
-            
-        else:
-            raise TypeError("Telecom must be a list of dicts")
+
 
 
     def calculate_register_quality(self):
