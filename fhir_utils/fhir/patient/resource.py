@@ -291,9 +291,8 @@ class Patient:
         # check if any resource is not valid
         if force_invalid_merge == False and (self._is_valid == False or nr._is_valid == False):
             raise ValueError("Can't merge invalid resource")
-            
-        if force_invalid_merge == True:
-            logging.warning("Force merge invalid resources enabled")
+        elif force_invalid_merge == True and (self._is_valid == False or nr._is_valid == False): 
+            logging.warning("Merging invalid resources")
 
         # start merge process
         return replace(self,
