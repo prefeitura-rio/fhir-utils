@@ -286,4 +286,140 @@ class Patient:
                         source = "smsrio",
                         )
 
-    # TODO: add method to export to fhir (dict)
+    def to_fhir(self):
+
+        # BUILD MORE COMPLEX STRUCTURES
+        # Identifier
+        identifier = []
+
+        cpf = {"use": "official",
+               "type": {
+                   "coding": [{
+                       "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                       "code": "TAX"}]},
+               "system": "https://rnds-fhir.saude.gov.br/NamingSystem/cpf",
+               "value": self.cpf}
+        identifier.append(cpf)
+
+        if self.cns != "":
+            cns = {"use": "official",
+                   "type": {
+                       "coding": [{
+                           "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                           "code": "HC"}]},
+                   "system": "https://rnds-fhir.saude.gov.br/NamingSystem/cns",
+                   "value": self.cns}
+            identifier.append(cns)
+
+        # Name
+        name = {"use": "official",
+                "text": self.name}
+
+        # Extensions
+        extension = []
+
+        # register quality
+        if self.register_quality != "":
+            registerQuality = {"url":"http://www.saude.gov.br/fhir/r4/StructureDefinition/BRQualidadeCadastroIndividuo-1.0",
+                               "valuePositiveInt": self.register_quality}
+            extension.append(registerQuality)
+        
+        # mother
+        if self.mother != "":
+            mother = {"extension": [{"url": "relationship",
+                                     "valueCode": "mother"},
+                                    {"url": "parent",
+                                     "valueHumanName": {
+                                         "use": "official",
+                                         "text": self.mother}}],
+                      "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0"}
+            extension.append(mother)
+
+        # father
+        if self.father != "":
+            father = {"extension": [{"url": "relationship",
+                                     "valueCode": "father"},
+                                    {"url": "parent",
+                                     "valueHumanName": {
+                                          "use": "official",
+                                          "text": self.father}}],
+                      "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0"}
+            extension.append(father)
+        
+        # race and ethnicity
+        if self.race != "" or self.ethnicity != "":
+            raceEthnicity = {"url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRRacaCorEtnia-1.0",
+                             "extension": []}
+            
+            if self.race != "":
+                raceEthnicity["extension"].append({"url": "race",
+                                                   "valueCodeableConcept": {
+                                                        "coding": [{
+                                                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRRacaCor-1.0",
+                                                            "code": self.race }]}})
+                
+            if self.ethnicity != "":
+                raceEthnicity["extension"].append({"url": "indigenousEthnicity",
+                                                   "valueCodeableConcept": {
+                                                        "coding": [{
+                                                            "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BREtniaIndigena-1.0",
+                                                            "code": self.ethnicity }]}})
+
+            extension.append(raceEthnicity)
+            
+        # birth city
+        if self.birth_city != "":
+            birthCity = {"url":"http://www.saude.gov.br/fhir/r4/StructureDefinition/BRMunicipio-1.0",
+                               "valueCodeableConcept": {
+                                   "coding": [{
+                                       "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRMunicipio-1.0",
+                                       "code": self.birth_city }]}}
+            extension.append(birthCity)    
+
+        # birth country
+        if self.birth_country != "":
+            birthCountry = {"url":"http://www.saude.gov.br/fhir/r4/StructureDefinition/BRPais-1.0",
+                            "valueCodeableConcept": {
+                                "coding": [{
+                                    "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRPais-1.0",
+                                    "code": self.birth_country }]}}
+            
+            extension.append(birthCountry) 
+
+        # nationality
+        if self.nationality != "":
+            nationality = {"url":"http://www.saude.gov.br/fhir/r4/StructureDefinition/BRNacionalidade",
+                           "valueCodeableConcept": {
+                               "coding": [{
+                                   "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRNacionalidade",
+                                   "code": self.nationality }]}}
+            
+            extension.append(nationality) 
+
+        # naturalization
+        if self.naturalization != "":
+            naturalization = {"url":"http://www.saude.gov.br/fhir/r4/StructureDefinition/BRNaturalizacao-1.0",
+                              "valueCodeableConcept": {
+                                  "coding": [{
+                                      "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRNaturalizacao-1.0",
+                                      "code": self.naturalization }]}}
+            
+            extension.append(naturalization) 
+        
+        # protected person
+        if self.protected_person != "":
+            protectedPerson = {"url":"http://www.saude.gov.br/fhir/r4/StructureDefinition/BRIndividuoProtegido-1.0",
+                               "valueBoolean": self.protected_person}
+            extension.append(protectedPerson)
+        
+    
+        # OUTPUT
+        return {"identifier": identifier,
+                "active": self.active,
+                "name": name,
+                "telecom": self.telecom,
+                "gender": self.gender,
+                "birthDate": self.birth_date,
+                "deceasedBoolean": self.deceased,
+                "address": self.address,
+                "extension": extension}
