@@ -250,16 +250,14 @@ class Patient:
                                "active", "address", "birth_city", "deceased", "nationality", 
                                "naturalization", "mother", "father", "protected_person", 
                                "race", "ethnicity","telecom"]
-        print(self._invalid_elements)
+
         for p in self.__dict__.items():
             if p[0] in quality_properties:
                 if p[0] in ["address", "telecom"]:
                     if len(p[1]) > 0 and p[0] not in self._invalid_elements:
                         counter += 1
-                        print(p[0])
                 elif p[1] != "" and p[1] != None and p[0] not in self._invalid_elements:
                     counter += 1
-                    print(p[0])
 
         self.register_quality = int(counter/len(quality_properties) * 100)
 
