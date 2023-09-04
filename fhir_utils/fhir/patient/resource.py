@@ -65,6 +65,9 @@ class Patient:
         self.check_gender()
         self.check_address()
         self.check_telecom()
+        self.check_nationality
+        self.check_race()
+        self.check_ethnicity()
 
         # calculate register quality
         self.calculate_register_quality()
@@ -121,14 +124,13 @@ class Patient:
             return True
         
     def check_birth_country(self):
-        if self.birth_country not in ["B", "E", "N"]:
+        if not 2 <= len(keep_numeric_characters(self.birth_country)) <= 3:
             self._is_valid = False
             self._invalid_elements.append("birth_country")
             return False
         else:
             return True
 
-    
     def check_birth_date(self):
         is_valid = True
         if not is_valid_date_format(self.birth_date):
@@ -214,6 +216,32 @@ class Patient:
                 self._invalid_elements.append("telecom")
                 return False
 
+    def check_race(self):
+        if self.race != "" and len(self.race) != 2:
+            self._is_valid = False
+            self._invalid_elements.append("race")
+            return False
+        else:
+            return True
+        
+    def check_ethnicity(self):
+        if self.ethnicity != "" and len(self.ethnicity) != 4:
+            self._is_valid = False
+            self._invalid_elements.append("ethnicity")
+            return False
+        else:
+            return True
+
+    def check_nationality(self):
+        if self.nationality not in ["B", "E", "N"]:
+            self._is_valid = False
+            self._invalid_elements.append("nationality")
+            return False
+        else:
+            return True
+        
+    #def check_naturalization(self):
+        # TODO: check natualization
 
     def calculate_register_quality(self):
         counter = 0
@@ -222,13 +250,16 @@ class Patient:
                                "active", "address", "birth_city", "deceased", "nationality", 
                                "naturalization", "mother", "father", "protected_person", 
                                "race", "ethnicity","telecom"]
+        print(self._invalid_elements)
         for p in self.__dict__.items():
             if p[0] in quality_properties:
                 if p[0] in ["address", "telecom"]:
                     if len(p[1]) > 0 and p[0] not in self._invalid_elements:
                         counter += 1
+                        print(p[0])
                 elif p[1] != "" and p[1] != None and p[0] not in self._invalid_elements:
                     counter += 1
+                    print(p[0])
 
         self.register_quality = int(counter/len(quality_properties) * 100)
 
@@ -326,24 +357,24 @@ class Patient:
         
         # mother
         if self.mother != "":
-            mother = {"extension": [{"url": "relationship",
+            mother = {"url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0",
+                      "extension": [{"url": "relationship",
                                      "valueCode": "mother"},
                                     {"url": "parent",
                                      "valueHumanName": {
                                          "use": "official",
-                                         "text": self.mother}}],
-                      "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0"}
+                                         "text": self.mother}}]}
             extension.append(mother)
 
         # father
         if self.father != "":
-            father = {"extension": [{"url": "relationship",
+            father = {"url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0",
+                      "extension": [{"url": "relationship",
                                      "valueCode": "father"},
                                     {"url": "parent",
                                      "valueHumanName": {
                                           "use": "official",
-                                          "text": self.father}}],
-                      "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0"}
+                                          "text": self.father}}]}
             extension.append(father)
         
         # race and ethnicity

@@ -1,0 +1,174 @@
+{
+    "identifier": [
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "code": "TAX"
+            }
+          ]
+        },
+        "system": "https://rnds-fhir.saude.gov.br/NamingSystem/cpf",
+        "value": "87877669810"
+      },
+      {
+        "use": "official",
+        "type": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+              "code": "HC"
+            }
+          ]
+        },
+        "system": "https://rnds-fhir.saude.gov.br/NamingSystem/cns",
+        "value": "123456789012345"
+      }
+    ],
+    "active": true,
+    "name": {
+      "use": "official",
+      "text": "John Doe"
+    },
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "5521123456789",
+        "use": "home"
+      }
+    ],
+    "gender": "male",
+    "birthDate": "2000-01-01",
+    "deceasedBoolean": false,
+    "address": [
+      {
+        "use": "home",
+        "type": "postal",
+        "line": [
+          "081",
+          "SQN  BLOCO M",
+          "604",
+          "APARTAMENTO",
+          "ASA NORTE"
+        ],
+        "city": "315780",
+        "state": "53",
+        "postalCode": "70752130"
+      }
+    ],
+    "extension": [
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRQualidadeCadastroIndividuo-1.0",
+        "valuePositiveInt": 100
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0",
+        "extension": [
+          {
+            "url": "relationship",
+            "valueCode": "mother"
+          },
+          {
+            "url": "parent",
+            "valueHumanName": {
+              "use": "official",
+              "text": "Jane Doe"
+            }
+          }
+        ]
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRParentesIndividuo-1.0",
+        "extension": [
+          {
+            "url": "relationship",
+            "valueCode": "father"
+          },
+          {
+            "url": "parent",
+            "valueHumanName": {
+              "use": "official",
+              "text": "John Doe Sr"
+            }
+          }
+        ]
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRRacaCorEtnia-1.0",
+        "extension": [
+          {
+            "url": "race",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BRRacaCor-1.0",
+                  "code": "05"
+                }
+              ]
+            }
+          },
+          {
+            "url": "indigenousEthnicity",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://www.saude.gov.br/fhir/r4/CodeSystem/BREtniaIndigena-1.0",
+                  "code": "X405"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRMunicipio-1.0",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRMunicipio-1.0",
+              "code": "315780"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRPais-1.0",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRPais-1.0",
+              "code": "10"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRNacionalidade",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRNacionalidade",
+              "code": "10"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRNaturalizacao-1.0",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRNaturalizacao-1.0",
+              "code": "10"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://www.saude.gov.br/fhir/r4/StructureDefinition/BRIndividuoProtegido-1.0",
+        "valueBoolean": false
+      }
+    ]
+  }
