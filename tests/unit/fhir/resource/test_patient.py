@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime
 from fhir_utils.fhir.patient.resource import Patient
+from dataclasses import asdict
 
 
 def test_format_cpf():
@@ -154,3 +155,57 @@ def test_check_telecom():
                                "use": "home"}] )
     assert patient.check_telecom() == True
 
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                     telecom=[{"system": "phone",
+                               "value": "552134567890"}] )
+    assert patient.check_telecom() == False and "telecom" in patient._invalid_elements
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B",
+                     telecom=[{"system": "email",
+                               "value": "abc.com",
+                               "use": "home"}] )
+    assert patient.check_telecom() == False and "telecom" in patient._invalid_elements
+
+def test_calculate_register_quality():
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B", deceased=False, active=True)
+    assert patient.register_quality == 33
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B", deceased=False, active=True,
+                     telecom=[{"system": "phone",
+                               "value": "552134567890",
+                               "use": "home"}])
+    assert patient.register_quality == 38
+
+    patient = Patient(source="smsrio", name="John Doe", cpf="1234567890", gender="male", birth_date="1990-01-01", birth_country="B", deceased=False, active=True,
+                     telecom=[{"system": "",
+                               "value": "552134567890",
+                               "use": "home"}])
+    assert patient.register_quality == 33
+
+def test_compare():
+    patient1 = Patient(source="smsrio", name="John Doe", cpf="12345678900", gender="male", birth_date="1990-01-01", birth_country="B")
+    patient2 = Patient(source="smsrio", name="John Doe", cpf="12345678900", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient1.compare(patient2) == {}
+
+    patient1 = Patient(source="smsrio", name="John", cpf="12345678900", gender="male", birth_date="1990-01-01", birth_country="B")
+    patient2 = Patient(source="smsrio", name="John Doe", cpf="12345678900", gender="male", birth_date="1990-01-01", birth_country="B")
+    assert patient1.compare(patient2) == {"values_changed": {"root.name": {"new_value": "John Doe", "old_value": "John"}}}
+
+def test_merge():
+    # valid resource
+    patient = Patient(source="smsrio", name="John Doe", cpf="878.776.698-10", gender="male", birth_date="1990-01-01", birth_country="B", active= True, father = "Caetano")
+    patient_new = Patient(source="smsrio", name="John Doe", cpf="878.776.698-10", gender="male", birth_date="1990-01-01", birth_country="B", active= False, mother = "Rita")
+    
+    expected_merge =  Patient(source="smsrio", name="John Doe", cpf="878.776.698-10", gender="male", birth_date="1990-01-01", birth_country="B", active= False, father= "Caetano", mother = "Rita")
+    
+    merged_patient = patient.merge(patient_new, force_invalid_merge=False)
+    
+    assert merged_patient == expected_merge
+
+    # invalid resource
+    patient = Patient(source="smsrio", name="John Doe", cpf="12345678900", gender="male", birth_date="1990-01-01", birth_country="B", active= True, father = "Caetano")
+    patient_new = Patient(source="smsrio", name="John Doe", cpf="12345678900", gender="male", birth_date="1990-01-01", birth_country="B", active= False, mother = "Rita")
+
+    with pytest.raises(ValueError) as excinfo:  
+        patient.merge(patient_new, force_invalid_merge=False) 
+    assert str(excinfo.value) == "Can't merge invalid resource" 

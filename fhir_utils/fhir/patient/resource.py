@@ -23,7 +23,7 @@ class Patient:
     birth_country : str
     cns : str = ""
     active : bool = True
-    address : list = field(default_factory=list)
+    address : str = ""
     birth_city : str = ""
     deceased : bool = False
     nationality : str = ""
@@ -33,7 +33,7 @@ class Patient:
     protected_person : bool = ""
     race: str = ""
     ethnicity : str = ""
-    telecom : list = field(default_factory=list)
+    telecom : str = ""
     register_quality : float = field(init = False)
     _is_valid: bool = field(init = False)
     _invalid_elements: list = field(init = False)
@@ -42,6 +42,8 @@ class Patient:
     def __post_init__(self):
         # default values
         self._resource_type = "patient"
+        self.telecom = [] if self.telecom == "" or self.telecom is None else self.telecom
+        self.address = [] if self.address == "" or self.address is None  else self.address
         self._is_valid = True
         self._invalid_elements = []
         self.register_quality = 0
@@ -186,13 +188,11 @@ class Patient:
     def check_telecom(self):
         # TODO: raise type error execption if not a list
         is_valid = True
-        print(is_valid)
         if type(self.telecom) is list:
 
             keys = ["system", "value", "use"]
             
             for i, telecom in enumerate(self.telecom):
-                print(telecom, i)
                 # if all must have keys are present
                 if not all(key in telecom for key in keys):
                     is_valid = False
@@ -201,8 +201,9 @@ class Patient:
                     is_valid = False
                 elif telecom["use"] not in ["home", "work", "temp", "old", "mobile"]:
                     is_valid = False
-                elif telecom["system"] == "phone" and not 12 <= len(keep_alpha_characters(telecom["value"])) <=13: # ddi+ddd+phone
+                elif telecom["system"] == "phone" and not 12 <= len(telecom["value"]) <=13: # ddi+ddd+phone
                     is_valid = False
+
                 elif telecom["system"] == "email" and not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", telecom["value"]):
                     is_valid = False
         
@@ -214,7 +215,6 @@ class Patient:
                 return False
 
 
-
     def calculate_register_quality(self):
         counter = 0
 
@@ -222,15 +222,16 @@ class Patient:
                                "active", "address", "birth_city", "deceased", "nationality", 
                                "naturalization", "mother", "father", "protected_person", 
                                "race", "ethnicity","telecom"]
-
         for p in self.__dict__.items():
             if p[0] in quality_properties:
-                if type(p[0]) is str and p[1] != "" and p[1] != None and p[0] not in self._invalid_elements:
-                    counter += 1 
-                elif type(p[0]) is list and len(p[1]) > 0 and p[0] not in self._invalid_elements:
+                if p[0] in ["address", "telecom"]:
+                    if len(p[1]) > 0 and p[0] not in self._invalid_elements:
+                        counter += 1
+                elif p[1] != "" and p[1] != None and p[0] not in self._invalid_elements:
                     counter += 1
 
         self.register_quality = int(counter/len(quality_properties) * 100)
+
 
     def compare(self, new_resource):
         # compare current patient with another one
@@ -271,7 +272,7 @@ class Patient:
                         birth_country = merge_element(self.birth_country, nr.birth_country, mode = "coalesce"),
                         cns = merge_element(self.cns, nr.cns, mode = "coalesce"),
                         active = merge_element(self.active, nr.active, mode = "replace"),
-                        address = merge_element(self.address, nr.address, mode = "append", unique_check=True, unique_key="postalCode"),
+                        address = merge_element(self.address, nr.address, mode = "union", unique_check=True, unique_key="postalCode"),
                         birth_city = merge_element(self.birth_city, nr.birth_city, mode = "coalesce"),
                         deceased = merge_element(self.deceased, nr.deceased, mode = "coalesce"),
                         nationality = merge_element(self.nationality, nr.nationality, mode = "coalesce"),
@@ -281,7 +282,7 @@ class Patient:
                         protected_person = merge_element(self.protected_person, nr.protected_person, mode = "coalesce"),
                         race = merge_element(self.race, nr.race, mode = "coalesce"),
                         ethnicity = merge_element(self.ethnicity, nr.ethnicity, mode = "coalesce"),
-                        telecom = merge_element(self.telecom, nr.telecom, mode = "append", unique_check=True, unique_key="value"),
+                        telecom = merge_element(self.telecom, nr.telecom, mode = "union", unique_check=True, unique_key="value"),
                         source = "smsrio",
                         )
 
