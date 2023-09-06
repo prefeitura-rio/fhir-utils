@@ -71,7 +71,7 @@ def fhir_to_dict(fhir_json: str, source: str) -> dict:
             "race": race,
             "ethnicity": ethnicity,
             "register_quality": register_quality,
-            "self.telecom":  fhir_json["telecom"] if "telecom" in fhir_json.keys() else "",
+            "telecom":  fhir_json["telecom"] if "telecom" in fhir_json.keys() else "",
             "_source": source,
             "_last_updated": ""
             }
