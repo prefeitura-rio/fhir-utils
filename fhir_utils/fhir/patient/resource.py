@@ -13,7 +13,7 @@ import re
 import logging
 
 
-@dataclass
+@dataclass()
 class Patient:
     source : str
     name : str
@@ -316,7 +316,7 @@ class Patient:
 
     def to_fhir(self):
 
-        # BUILD MORE COMPLEX STRUCTURES
+        # BUILD MORE COMPLEX DATA STRUCTURES
         # Identifier
         identifier = []
 
@@ -340,8 +340,8 @@ class Patient:
             identifier.append(cns)
 
         # Name
-        name = {"use": "official",
-                "text": self.name}
+        name = [{"use": "official",
+                 "text": self.name}]
 
         # Extensions
         extension = []

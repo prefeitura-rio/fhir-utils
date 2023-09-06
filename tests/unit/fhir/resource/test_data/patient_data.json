@@ -28,10 +28,12 @@
       }
     ],
     "active": true,
-    "name": {
+    "name": [
+      {
       "use": "official",
       "text": "John Doe"
-    },
+      }
+    ],
     "telecom": [
       {
         "system": "phone",
