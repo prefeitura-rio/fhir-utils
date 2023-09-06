@@ -1,5 +1,6 @@
 {
-    "identifier": [
+  "resourceType": "Patient",  
+  "identifier": [
       {
         "use": "official",
         "type": {

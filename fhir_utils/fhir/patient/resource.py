@@ -442,7 +442,8 @@ class Patient:
         
     
         # OUTPUT
-        return {"identifier": identifier,
+        return {"resourceType": "Patient",
+                "identifier": identifier,
                 "active": self.active,
                 "name": name,
                 "telecom": self.telecom,
