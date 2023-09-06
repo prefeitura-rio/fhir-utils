@@ -258,7 +258,7 @@ def test_to_fhir():
         }],
         birth_city="315780",
         deceased=False,
-        nationality="10",
+        nationality="B",
         naturalization="10",
         mother="Jane Doe",
         father="John Doe Sr.",

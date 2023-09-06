@@ -152,7 +152,7 @@
           "coding": [
             {
               "system": "https://rnds-fhir.saude.gov.br/CodeSystem/BRNacionalidade",
-              "code": "10"
+              "code": "B"
             }
           ]
         }
