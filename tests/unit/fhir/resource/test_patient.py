@@ -1,5 +1,4 @@
 import pytest
-from datetime import datetime
 from fhir_utils.fhir.patient.resource import Patient
 from fhir_utils.utils import json_to_dict
 import os

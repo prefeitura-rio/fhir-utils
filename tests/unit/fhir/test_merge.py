@@ -1,4 +1,3 @@
-import pytest
 from dataclasses import dataclass
 from fhir_utils.fhir.merge import compare_resources, merge_element
 
