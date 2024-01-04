@@ -26,7 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import json
+<pre><code class="python"># -*- coding: utf-8 -*-
+import json
 import xmltodict
 
 def json_to_dict(json_file_path):
@@ -53,8 +54,8 @@ def xml_to_dict(xml_file_path):
     except Exception as e:
         print(f&#34;Error: Unable to parse XML file. Reason: {str(e)}&#34;)
         return None
- 
-    
+
+
 def save_to_json(dict, json_path,):
     with open(json_path, &#34;w&#34;) as file:
         json.dump(dict, file)</code></pre>
