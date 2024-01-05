@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "API for FHIR Utils"
 authors = ["Escritório de Dados <escritoriodedados@gmail.com>"]
 license = "GPL-3.0-only"
-readme = "README.md"
 homepage = "https://github.com/prefeitura-rio/fhir-utils"
 repository = "https://github.com/prefeitura-rio/fhir-utils"
 keywords = ["fhir", "utilities", "data", "health", "government"]
@@ -22,6 +21,8 @@ python-multipart = "^0.0.6"
 sentry-sdk = { version = "^1.37.1", extras = ["fastapi"] }
 tortoise-orm = { extras = ["asyncpg"], version = "^0.20.0" }
 uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
+httpx = "^0.26.0"
+pytest = "^7.4.4"
 
 
 [tool.poetry.group.dev.dependencies]
